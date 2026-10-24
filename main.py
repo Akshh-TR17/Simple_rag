@@ -1,14 +1,4 @@
-"""
-Simple PDF Question Answering System Using RAG
-===============================================
-A simple, beginner-friendly Retrieval-Augmented Generation (RAG) application.
-Built with:
-  - FastAPI: REST API & Swagger UI documentation
-  - PyMuPDF: Extracting text from PDF pages
-  - Ollama: Local AI inference (nomic-embed-text & qwen2.5:0.5b)
-  - NumPy: Cosine similarity search
-  - JSON: Lightweight local vector store
-"""
+# Simple PDF Question Answering System using RAG
 
 import os
 import json
@@ -19,9 +9,7 @@ import ollama
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-# ============================================================================
-# CONFIGURATION & CONSTANTS
-# ============================================================================
+# Configuration & Constants
 PDF_FILE_PATH = "sample.pdf"
 VECTOR_STORE_PATH = "vector_store.json"
 EMBEDDING_MODEL = "nomic-embed-text"
@@ -36,9 +24,7 @@ _cached_chunks = None
 _cached_mtime = None
 
 
-# ============================================================================
-# 1. PDF TEXT EXTRACTION
-# ============================================================================
+# 1. PDF Text Extraction
 def extract_text_from_pdf(pdf_path: str) -> list[dict]:
     """
     Extracts text from every page of the given PDF file using PyMuPDF.
@@ -66,9 +52,7 @@ def extract_text_from_pdf(pdf_path: str) -> list[dict]:
     return pages_data
 
 
-# ============================================================================
-# 2. TEXT CHUNKING
-# ============================================================================
+# 2. Text Chunking
 def chunk_text(pages_data: list[dict], chunk_size: int = CHUNK_SIZE, chunk_overlap: int = CHUNK_OVERLAP) -> list[dict]:
     """
     Splits the extracted page text into smaller overlapping chunks.
@@ -111,9 +95,7 @@ def chunk_text(pages_data: list[dict], chunk_size: int = CHUNK_SIZE, chunk_overl
     return chunks
 
 
-# ============================================================================
-# 3. EMBEDDING GENERATION
-# ============================================================================
+# 3. Embedding Generation
 def get_embedding(text: str, model: str = EMBEDDING_MODEL) -> list[float]:
     """
     Generates a dense vector embedding for a string using Ollama's nomic-embed-text.
@@ -128,9 +110,7 @@ def get_embedding(text: str, model: str = EMBEDDING_MODEL) -> list[float]:
         )
 
 
-# ============================================================================
-# 4. JSON VECTOR STORE
-# ============================================================================
+# 4. JSON Vector Store
 def is_vector_store_valid(pdf_path: str, store_path: str, embedding_model: str) -> bool:
     """
     Checks if an existing vector_store.json is up-to-date with the current PDF.
@@ -237,9 +217,7 @@ def get_chunks() -> list[dict]:
     return _cached_chunks
 
 
-# ============================================================================
-# 5. SIMILARITY SEARCH (COSINE SIMILARITY)
-# ============================================================================
+# 5. Similarity Search (Cosine Similarity)
 def cosine_similarity(vector_a: list[float], vector_b: list[float]) -> float:
     """
     Calculates cosine similarity between two vectors using NumPy.
@@ -274,9 +252,7 @@ def retrieve_top_chunks(query: str, chunks: list[dict], top_k: int = TOP_K) -> l
     return [chunk for _, chunk in scored_chunks[:top_k]]
 
 
-# ============================================================================
-# 6. ANSWER GENERATION
-# ============================================================================
+# 6. Answer Generation
 def generate_answer(question: str, top_chunks: list[dict]) -> str:
     """
     Generates an answer using Ollama's qwen2.5:0.5b model based solely on retrieved context.
@@ -315,9 +291,7 @@ Answer:"""
         )
 
 
-# ============================================================================
-# 7. FASTAPI APPLICATION & LIFESPAN
-# ============================================================================
+# 7. FastAPI Application & Lifespan
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
